@@ -10,7 +10,7 @@ fi
 rm -f cptest cptestout
 
 tempdir="$(mktemp -d perlXXXXX)"
-cp -R $cpopt "$PERLBREW_ROOT/perls/$perl/" "$tempdir/"
+cp -R $cpopt "$PERLBREW_ROOT/perls/$perl" "$tempdir/$perl"
 (
   echo "Perl $perl built by Travis Helpers: $(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
   echo '------------------------------------------------------------------------------'
@@ -22,7 +22,7 @@ cp -R $cpopt "$PERLBREW_ROOT/perls/$perl/" "$tempdir/"
   fi
 ) > "$tempdir/README"
 git add -f "$tempdir"
-tree="$(git write-tree --prefix="$tempdir/")"
+tree="$(git write-tree --prefix="$tempdir/$perl/")"
 git reset -q -- "$tempdir"
 rm -rf "$tempdir"
 export GIT_AUTHOR_NAME="$(git log -n 1 --format='%an')"
