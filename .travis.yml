@@ -1,6 +1,15 @@
 language: perl
 perl:
+  - "5.6.2"
+  - "5.8.1"
+  - "5.8.5"
+  - "5.8.7"
   - "5.8.8"
+  - "5.8.9"
+  - "5.18.1"
+  - "5.18.2"
+  - "5.20"
+  - "5.20.0"
 env:
   secure: "oRQHly05F2F1kaHz+d7D0Or85R6fshxCS3D9G8G0jqLOQcm8jUTwr6lEn7QHUU9e8A8MUk90LKeqNhIlX1CslniOuIbdg5V4eM70kHeZk6WRlsNn5J7QslgWnWZ//0+Kfeawe7d8XVam5FGFwNKrjYl75rl24l4bReV946IXvSY="
 before_install:
