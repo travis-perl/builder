@@ -15,7 +15,6 @@ cp -R $cpopt "$PERLBREW_ROOT/perls/$perl" "$tempdir/$perl"
   echo "Perl $perl built by Travis Helpers: $(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
   echo '------------------------------------------------------------------------------'
   "$PERLBREW_ROOT/perls/$perl/bin/perl" -v
-  echo '------------------------------------------------------------------------------'
   if [ -e /etc/lsb-release ]; then
     echo '------------------------------------------------------------------------------'
     cat /etc/lsb-release
