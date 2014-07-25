@@ -1,0 +1,7 @@
+#!/bin/sh
+
+"$@" "$TRAVIS_PERL_VERSION"
+
+while read variant; do
+  "$@" "$TRAVIS_PERL_VERSION-$variant"
+done < variants.txt

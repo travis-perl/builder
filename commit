@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+perl="$1"
+
+rm -rf "$perl"
+cp -r "$PERLBREW_ROOT/perls/$perl" "$perl"
+echo "Perl $perl built by Travis Helpers: $(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)" > "$perl/README"
+echo '------------------------------------------------------------------------------' >> "$perl/README"
+"$PERLBREW_ROOT/perls/$perl/bin/perl" -v > "$perl/README"
+echo '------------------------------------------------------------------------------' >> "$perl/README"
+if [ -e /etc/lsb-release ]; then
+  echo '------------------------------------------------------------------------------' >> "$perl/README"
+  cat /etc/lsb-release >> "$perl/README"
+fi
+git reset -q
+git add -f "$perl"
+tree="$(git write-tree --prefix="$perl")"
+export GIT_AUTHOR_NAME="$(git log -n 1 --format='%an')"
+export GIT_AUTHOR_EMAIL="$(git log -n 1 --format='%ae')"
+export GIT_COMMITTER_NAME="Travis CI"
+export GIT_COMMITTER_EMAIL="travis-ci@$(hostname -f)"
+parent="$(git ls-remote origin refs/heads/perl-$perl | cut -f 1)"
+if [ -n "$parent" ]; then
+  parent = "-p $parent"
+fi
+ref="$(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
+commit="$(git commit-tree "$tree" $parent -m "Perl $perl built for $ref")"
+git branch "perl-$perl" "$commit"

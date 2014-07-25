@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+perl="$1"
+
+echo "TODO: push $perl"
