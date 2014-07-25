@@ -2,7 +2,7 @@ language: perl
 perl:
   - "5.8.8"
 env:
-  secure: "q9bwOsQvpvzcD4k0G4O1LhbhttABEtfFJAPC6+Kvompa7HqXF48MVf1c0protmI1+UcxPI78ooVMRUByhtnyCCh+pipeqmbSlixX0XtR2cAPI7XbjACqo4YVtoQTVkpDkIVQGeQ1Xkx5XYNttERUexUSQ187bUDvM5L6YtcJUk4="
+  secure: "oRQHly05F2F1kaHz+d7D0Or85R6fshxCS3D9G8G0jqLOQcm8jUTwr6lEn7QHUU9e8A8MUk90LKeqNhIlX1CslniOuIbdg5V4eM70kHeZk6WRlsNn5J7QslgWnWZ//0+Kfeawe7d8XVam5FGFwNKrjYl75rl24l4bReV946IXvSY="
 before_install:
   - sudo apt-get update -qq
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper

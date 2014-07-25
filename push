@@ -6,7 +6,12 @@ for arg; do
   branches+=("perl-$arg")
 done
 
-git config credential.helper "store --file=.git/credentials"
-echo "https://${GH_TOKEN}:@github.com" > .git/credentials
+if [ ! -e id_rsa.dec ]; then
+  cp id_rsa id_rsa.dec
+  ssh-keygen -p -f id_rsa.dec -P "$SSH_KEY_PASS" -N '' || rm id_rsa.dec
+fi
 
-git push origin "${branches[@]}"
+git config --add url.git@github.com:.pushInsteadOf git://github.com/
+git config --add url.git@github.com:.pushInsteadOf https://github.com/
+
+GIT_SSH=./ssh-wrapper git push origin "${branches[@]}"
