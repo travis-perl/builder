@@ -20,6 +20,11 @@ cp -R $cpopt "$PERLBREW_ROOT/perls/$perl" "$tempdir/$perl"
     cat /etc/lsb-release
   fi
 ) > "$tempdir/$perl/README"
+cat - > "$tempdir/$perl/.travis.yml" <<END_TRAVISYML
+branches:
+  only:
+    - master
+END_TRAVISYML
 git add -f "$tempdir/$perl/"
 tree="$(git write-tree --prefix="$tempdir/$perl/")"
 git reset -q -- "$tempdir"
