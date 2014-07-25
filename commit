@@ -30,7 +30,9 @@ export GIT_COMMITTER_NAME="Travis CI"
 export GIT_COMMITTER_EMAIL="travis-ci@$(hostname -f)"
 parent="$(git rev-parse -q --verify refs/heads/perl-$perl || true)"
 if [ -z "$parent" ]; then
-  parent="$(git ls-remote origin refs/heads/perl-$perl | cut -f 1)"
+  if git fetch --depth=1 origin perl-$perl; then
+    parent="$(git rev-parse FETCH_HEAD)"
+  fi
 fi
 if [ -n "$parent" ]; then
   parent="-p $parent"
