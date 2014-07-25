@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 "$@" "$TRAVIS_PERL_VERSION"
 
