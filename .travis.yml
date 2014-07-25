@@ -36,9 +36,8 @@ before_install:
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
   - source ~/perl-travis-helper/init
 install:
-  - true
-script:
   - ./per-variant ./build
+script:
   - ./per-variant ./commit
 after_success:
   - ./push $(./per-variant echo)
