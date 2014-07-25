@@ -29,6 +29,8 @@ perl:
   - "5.18.1"
   - "5.18.2"
   - "5.20.0"
+env:
+  secure: "q9bwOsQvpvzcD4k0G4O1LhbhttABEtfFJAPC6+Kvompa7HqXF48MVf1c0protmI1+UcxPI78ooVMRUByhtnyCCh+pipeqmbSlixX0XtR2cAPI7XbjACqo4YVtoQTVkpDkIVQGeQ1Xkx5XYNttERUexUSQ187bUDvM5L6YtcJUk4="
 before_install:
   - sudo apt-get update -qq
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
@@ -39,6 +41,9 @@ script:
   - ./per-variant ./build
   - ./per-variant ./commit
 after_success:
-  - ./per-variant ./push
+  - ./push $(./per-variant echo)
+branches:
+  only:
+    - master
 notifications:
   email: false

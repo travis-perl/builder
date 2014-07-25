@@ -1,5 +1,12 @@
 #!/bin/sh
 set -e
-perl="$1"
 
-echo "TODO: push $perl"
+declare -a branches
+for arg; do
+  branches+=("perl-$arg")
+done
+
+git config credential.helper "store --file=.git/credentials"
+echo "https://${GH_TOKEN}:@github.com" > .git/credentials
+
+git push origin "${branches[@]}"
