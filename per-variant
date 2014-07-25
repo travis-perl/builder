@@ -1,7 +1,24 @@
 #!/bin/bash
 
-"$@" "$TRAVIS_PERL_VERSION"
+declare -a variants
+declare -a defaults
 
-while read variant; do
-  "$@" "$TRAVIS_PERL_VERSION-$variant"
+while read version variant; do
+  full="$TRAVIS_PERL_VERSION"
+  if [ "$variant" != "-" ]; then
+    full+="-$variant"
+  fi
+  if [ "$version" == "*" ]; then
+    defaults+=("$full")
+  elif [ "$version" == "$TRAVIS_PERL_VERSION" ]; then
+    variants+=("$full")
+  fi
 done < variants.txt
+
+if [ "${#variants[@]}" == "0" ]; then
+  variants=("${defaults[@]}")
+fi
+
+for variant in "${variants[@]}"; do
+  "$@" "$variant"
+done
