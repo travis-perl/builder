@@ -4,3 +4,20 @@ perl="$1"
 
 export REBUILD_PERL=1
 $HELPER_ROOT/build-perl "$perl"
+
+if [[ "$perl" =~ ^5\.[0-9]*$ ]] || [[ "$perl" =~ ^5\.[0-9]*- ]]; then
+  source "$PERLBREW_ROOT/etc/bashrc"
+  perlbrew use "$perl"
+  $HELPER_ROOT/cpan-install <<END_PREREQS
+    Dist::Zilla
+    Moose
+    Test::Pod
+    Test::Pod::Coverage
+    Test::Exception
+    Test::Kwalitee
+    Dist::Zilla::Plugin::Bootstrap::lib
+    LWP
+    Module::Install
+    Test::Most
+END_PREREQS
+fi
