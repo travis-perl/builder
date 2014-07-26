@@ -7,16 +7,6 @@ $HELPER_ROOT/build-perl "$perl"
 
 if perl -e'exit !(shift =~ /^5\.\d+($|-)/)' "$perl"; then
   source "$PERLBREW_ROOT/etc/bashrc"
-  perlbrew use "$perl"
-  $HELPER_ROOT/cpan-install \
-    Dist::Zilla \
-    Moose \
-    Test::Pod \
-    Test::Pod::Coverage \
-    Test::Exception \
-    Test::Kwalitee \
-    Dist::Zilla::Plugin::Bootstrap::lib \
-    LWP \
-    Module::Install \
-    Test::Most
+  perlbrew use "$perl_version"
+  $HELPER_ROOT/cpan-install $($HELPER_ROOT/modules-for-local-lib travis)
 fi
