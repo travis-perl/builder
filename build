@@ -18,5 +18,5 @@ if perl -e'exit !(shift =~ /^5\.\d+($|-)/)' "$perl"; then
     Dist::Zilla::Plugin::Bootstrap::lib \
     LWP \
     Module::Install \
-    Test::Most \
+    Test::Most
 fi
