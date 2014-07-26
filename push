@@ -3,7 +3,13 @@ set -e
 
 declare -a branches
 for arg; do
-  branches+=("perl-$arg")
+  local_lib="${arg/*@/}"
+  [ "$local_lib" == "$arg" ] && unset local_lib
+  perl_version="${arg/@*/}"
+  branches+=("perl/$perl_version")
+  if [ -n "$local_lib" ]; then
+    branches+=("libs/$perl_version/$local_lib")
+  fi
 done
 
 if [ ! -e id_rsa.dec ]; then

@@ -1,48 +1,87 @@
 #!/bin/bash
 set -e
-perl="$1"
 
 cpopt=''
-touch cptest
-if cp -l cptest cptestout 2>/dev/null; then
+cptest="$(mktemp cptest-XXXXX)"
+cptestout="$(mktemp cptestout-XXXXX)"
+if cp -l $cptest $cptestout 2>/dev/null; then
   cpopt='-l'
 fi
-rm -f cptest cptestout
+rm -f $cptest $cptestout
 
-tempdir="$(mktemp -d perlXXXXX)"
-cp -R $cpopt "$PERLBREW_ROOT/perls/$perl" "$tempdir/$perl"
-(
-  echo "Perl $perl built by Travis Helpers: $(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
-  echo '------------------------------------------------------------------------------'
-  "$PERLBREW_ROOT/perls/$perl/bin/perl" -v
-  if [ -e /etc/lsb-release ]; then
-    echo '------------------------------------------------------------------------------'
-    cat /etc/lsb-release
-  fi
-) > "$tempdir/$perl/README"
-cat - > "$tempdir/$perl/.travis.yml" <<END_TRAVISYML
+function commit_branch {
+  local branch="$1"
+  local src="$2"
+  local msg="$3"
+  local readme="$4"
+
+  local tempdir="$(mktemp -d build-XXXXX)"
+  local commitroot="$tempdir/commitroot"
+  cp -R $cpopt "$src" "$commitroot"
+  echo "$readme" > "$commitroot/README"
+  cat - > "$commitroot/.travis.yml" <<END_TRAVISYML
 branches:
   only:
     - master
 END_TRAVISYML
-git add -f "$tempdir/$perl/"
-tree="$(git write-tree --prefix="$tempdir/$perl/")"
-git reset -q -- "$tempdir"
-rm -rf "$tempdir"
-export GIT_AUTHOR_NAME="$(git log -n 1 --format='%an')"
-export GIT_AUTHOR_EMAIL="$(git log -n 1 --format='%ae')"
-export GIT_COMMITTER_NAME="Travis CI"
-export GIT_COMMITTER_EMAIL="travis-ci@$(hostname -f)"
-parent="$(git rev-parse -q --verify refs/heads/perl-$perl || true)"
-if [ -z "$parent" ]; then
-  if git fetch --depth=1 origin perl-$perl; then
-    parent="$(git rev-parse FETCH_HEAD)"
+  git add -f "$commitroot/"
+  local tree="$(git write-tree --prefix="$commitroot/")"
+  git reset -q -- "$tempdir"
+  rm -rf "$tempdir"
+  export GIT_AUTHOR_NAME="$(git log -n 1 --format='%an')"
+  export GIT_AUTHOR_EMAIL="$(git log -n 1 --format='%ae')"
+  export GIT_COMMITTER_NAME="Travis CI"
+  export GIT_COMMITTER_EMAIL="travis-ci@$(hostname -f)"
+  local parent="$(git rev-parse -q --verify "refs/heads/$branch" || true)"
+  if [ -z "$parent" ]; then
+    if git fetch --depth=1 origin "$branch" 2>/dev/null; then
+      parent="$(git rev-parse FETCH_HEAD)"
+    fi
   fi
+  if [ -n "$parent" ]; then
+    parent="-p $parent"
+  fi
+  local commit="$(git commit-tree "$tree" $parent -m "$msg")"
+  git update-ref "refs/heads/$branch" "$commit"
+  echo "Committed $(git describe --all --long $branch)"
+}
+
+full_version="$1"
+local_lib="${full_version/*@/}"
+perl_version="${full_version/@*/}"
+[ "$local_lib" == "$full_version" ] && unset local_lib
+
+helper_ref="$(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
+ref="$(git describe --all --long HEAD)"
+perlbranch="perl/$perl_version"
+commitmessage="Perl $perl_version built for $ref"
+git rev-parse --verify -q "$perlbranch" >/dev/null \
+  && lastcommit="$(git log --format='%s' -n 1 "$perlbranch")"
+if [ "$lastcommit" != "$commitmessage" ]; then
+  readme="$(
+    echo "Perl $perl_version built by Travis Helpers: $helper_ref"
+    echo '------------------------------------------------------------------------------'
+    "$PERLBREW_ROOT/perls/$perl_version/bin/perl" -v
+    if [ -e /etc/lsb-release ]; then
+      echo '------------------------------------------------------------------------------'
+      cat /etc/lsb-release
+    fi
+  )"
+  commit_branch "$perlbranch" "$PERLBREW_ROOT/perls/$perl_version" "$commitmessage" "$readme"
 fi
-if [ -n "$parent" ]; then
-  parent="-p $parent"
+
+if [ -n "$local_lib" ]; then
+  readme="$(
+    echo "local::lib $local_lib for Perl $perl_version built by Travis Helpers: $helper_ref"
+    echo '------------------------------------------------------------------------------'
+    "$PERLBREW_ROOT/perls/$perl_version/bin/perl" -v
+    if [ -e /etc/lsb-release ]; then
+      echo '------------------------------------------------------------------------------'
+      cat /etc/lsb-release
+    fi
+  )"
+  commit_branch "libs/$perl_version/$local_lib" \
+    "$PERLBREW_HOME/libs/$perl_version@$local_lib" \
+    "local::lib $local_lib for Perl $perl_version built for $ref" \
+    "$readme"
 fi
-ref="$(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
-commit="$(git commit-tree "$tree" $parent -m "Perl $perl built for $ref")"
-git update-ref "refs/heads/perl-$perl" "$commit"
-echo "Committed $(git describe --all --long perl-$perl)"
