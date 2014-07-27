@@ -6,10 +6,10 @@ perl_version="${full_version/@*/}"
 [ "$local_lib" == "$full_version" ] && unset local_lib
 
 export REBUILD_PERL=1
-$HELPER_ROOT/build-perl "$full_version"
+$HELPER_ROOT/bin/build-perl "$full_version"
 
 if [[ "${perl_version/-*/}" =~ ^5.[0-9][0-9]?$ ]]; then
   source "$PERLBREW_ROOT/etc/bashrc"
   perlbrew use "$perl_version"
-  $HELPER_ROOT/cpan-install $($HELPER_ROOT/modules-for-local-lib travis)
+  $HELPER_ROOT/bin/cpan-install $($HELPER_ROOT/bin/modules-for-local-lib travis)
 fi
