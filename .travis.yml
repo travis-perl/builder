@@ -16,14 +16,14 @@ before_install:
   - sudo apt-get update -qq
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
   - source ~/perl-travis-helper/init
-install:
   - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"system\" ] && export NO_COMMIT_PERL=1"
   - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"$PERLBREW_PERL\" ] && export NO_COMMIT_PERL=1"
-  - ./per-variant ./build
+install:
+  - ./per-local-lib $TRAVIS_PERL_VERSION ./build
 script:
-  - ./per-variant ./commit
+  - ./per-local-lib $TRAVIS_PERL_VERSION ./commit
 after_success:
-  - ./push $(./per-variant echo)
+  - ./push $(./per-local-lib $TRAVIS_PERL_VERSION echo)
 branches:
   exclude:
     - /^perl\//
