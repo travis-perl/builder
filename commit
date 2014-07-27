@@ -53,7 +53,7 @@ perl_version="${full_version/@*/}"
 
 helper_ref="$(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
 ref="$(git describe --all --long HEAD)"
-if [ -z "$TRAVIS_PROVIDED" ]; then
+if [ -z "$NO_COMMIT_PERL" ]; then
   perlbranch="perl/$perl_version"
   commitmessage="Perl $perl_version built for $ref"
   git rev-parse --verify -q "$perlbranch" >/dev/null \
