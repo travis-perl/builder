@@ -2,6 +2,8 @@
 
 declare -a variants
 declare -a defaults
+declare -a local_libs
+declare -a default_local_libs
 
 while read version variant; do
   full="$TRAVIS_PERL_VERSION"
@@ -15,10 +17,32 @@ while read version variant; do
   fi
 done < variants.txt
 
+all_local_libs="$(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | sort -u)"
+
 if [ "${#variants[@]}" == "0" ]; then
   variants=("${defaults[@]}")
 fi
 
+while read version local_lib; do
+  if [ "$local_lib" == "*" ]; then
+    local_lib="$all_local_libs"
+  fi
+  if [ "$version" == "*" ]; then
+    default_local_libs+=($local_lib)
+  elif [ "$version" == "$TRAVIS_PERL_VERSION" ]; then
+    local_libs+=($local_lib)
+  fi
+done < local-libs.txt
+
+if [ "${#local_libs[@]}" == "0" ]; then
+  local_libs=("${default_local_libs[@]}")
+elif [ "${#local_libs[@]}" == 1 ] && [ "${local_libs[0]}" == "-" ]; then
+  local_libs=()
+fi
+
 for variant in "${variants[@]}"; do
   "$@" "$variant"
+  for local_lib in "${local_libs[@]}"; do
+    "$@" "$variant@$local_lib"
+  done
 done
