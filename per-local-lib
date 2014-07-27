@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+perl_version="${1/@*/}"
+bare_version="${perl_version/-*/}"
+local_lib="${1/*@/}"
+[ "$local_lib" == "$1" ] && unset local_lib
+shift
+
+declare -a local_libs
+declare -a defaults
+declare -a all_local_libs
+
+all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | sort -u))
+
+if [ -n "$local_lib" ]; then
+  local_libs=("$local_lib")
+else
+  while read version ll; do
+    declare -a libs
+    if [ "$ll" == "*" ]; then
+      libs=("${all_local_libs[@]}")
+    elif [ "$ll" == '-' ]; then
+      libs=('')
+    else
+      libs=("$ll")
+    fi
+
+    if [ "$version" == "*" ]; then
+      default_local_libs+=("${libs[@]}")
+    elif [ "$version" == "$bare_version" ]; then
+      local_libs+=("${libs[@]}")
+    fi
+  done < local-libs.txt
+fi
+
+if [ "${#local_libs[@]}" == "0" ]; then
+  local_libs=("${default_local_libs[@]}")
+fi
+
+for ll in "${local_libs[@]}"; do
+  [ -n "$ll" ] && ll="@$ll"
+  "$@" "$perl_version$ll"
+done
