@@ -16,8 +16,8 @@ before_install:
   - sudo apt-get update -qq
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
   - source ~/perl-travis-helper/init
-  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"system\" ] && export NO_COMMIT_PERL=1"
-  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"$PERLBREW_PERL\" ] && export NO_COMMIT_PERL=1"
+  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"system\" ] && export NO_COMMIT_PERL=1 || true"
+  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"$PERLBREW_PERL\" ] && export NO_COMMIT_PERL=1 || true"
 install:
   - ./per-local-lib $TRAVIS_PERL_VERSION ./build
 script:
