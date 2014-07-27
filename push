@@ -1,16 +1,24 @@
 #!/bin/bash
 set -e
 
+if [ -n "$TRAVIS_PULL_REQUEST" ] && [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+  exit 0
+fi
+current_branch="$(git symbolic-ref --short -q HEAD || echo "$TRAVIS_BRANCH")"
 declare -a branches
 for arg; do
   local_lib="${arg/*@/}"
   [ "$local_lib" == "$arg" ] && unset local_lib
   perl_version="${arg/@*/}"
+  remote_perl_version="$perl_version"
+  if [ "$current_branch" != "master" ]; then
+    remote_perl_version="$current_branch/$perl_version"
+  fi
   if [ -z "$NO_COMMIT_PERL" ]; then
-    branches+=("perl/$perl_version")
+    branches+=("perl/$perl_version:perl/$remote_perl_version")
   fi
   if [ -n "$local_lib" ]; then
-    branches+=("libs/$perl_version/$local_lib")
+    branches+=("libs/$perl_version/$local_lib:libs/$remote_perl_version/$local_lib")
   fi
 done
 

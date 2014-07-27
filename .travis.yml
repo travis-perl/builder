@@ -25,7 +25,8 @@ script:
 after_success:
   - ./push $(./per-variant echo)
 branches:
-  only:
-    - master
+  exclude:
+    - /^perl\//
+    - /^libs\//
 notifications:
   email: false
