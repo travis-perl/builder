@@ -6,7 +6,9 @@ for arg; do
   local_lib="${arg/*@/}"
   [ "$local_lib" == "$arg" ] && unset local_lib
   perl_version="${arg/@*/}"
-  branches+=("perl/$perl_version")
+  if [ -z "$TRAVIS_PROVIDED" ]; then
+    branches+=("perl/$perl_version")
+  fi
   if [ -n "$local_lib" ]; then
     branches+=("libs/$perl_version/$local_lib")
   fi

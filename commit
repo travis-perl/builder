@@ -53,21 +53,23 @@ perl_version="${full_version/@*/}"
 
 helper_ref="$(git --git-dir="$HELPER_ROOT/.git" describe --all --long HEAD)"
 ref="$(git describe --all --long HEAD)"
-perlbranch="perl/$perl_version"
-commitmessage="Perl $perl_version built for $ref"
-git rev-parse --verify -q "$perlbranch" >/dev/null \
-  && lastcommit="$(git log --format='%s' -n 1 "$perlbranch")"
-if [ "$lastcommit" != "$commitmessage" ]; then
-  readme="$(
-    echo "Perl $perl_version built by Travis Helpers: $helper_ref"
-    echo '------------------------------------------------------------------------------'
-    "$PERLBREW_ROOT/perls/$perl_version/bin/perl" -v
-    if [ -e /etc/lsb-release ]; then
+if [ -z "$TRAVIS_PROVIDED" ]; then
+  perlbranch="perl/$perl_version"
+  commitmessage="Perl $perl_version built for $ref"
+  git rev-parse --verify -q "$perlbranch" >/dev/null \
+    && lastcommit="$(git log --format='%s' -n 1 "$perlbranch")"
+  if [ "$lastcommit" != "$commitmessage" ]; then
+    readme="$(
+      echo "Perl $perl_version built by Travis Helpers: $helper_ref"
       echo '------------------------------------------------------------------------------'
-      cat /etc/lsb-release
-    fi
-  )"
-  commit_branch "$perlbranch" "$PERLBREW_ROOT/perls/$perl_version" "$commitmessage" "$readme"
+      "$PERLBREW_ROOT/perls/$perl_version/bin/perl" -v
+      if [ -e /etc/lsb-release ]; then
+        echo '------------------------------------------------------------------------------'
+        cat /etc/lsb-release
+      fi
+    )"
+    commit_branch "$perlbranch" "$PERLBREW_ROOT/perls/$perl_version" "$commitmessage" "$readme"
+  fi
 fi
 
 if [ -n "$local_lib" ]; then
