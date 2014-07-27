@@ -22,7 +22,7 @@ function commit_branch {
   cat - > "$commitroot/.travis.yml" <<END_TRAVISYML
 branches:
   only:
-    - master
+    - "/ ^/" # never match
 END_TRAVISYML
   git add -f "$commitroot/"
   local tree="$(git write-tree --prefix="$commitroot/")"
