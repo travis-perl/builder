@@ -5,39 +5,34 @@ bare_version="${perl_version/-*/}"
 local_lib="${1/*@/}"
 [ "$local_lib" == "$1" ] && unset local_lib
 shift
+cmd="$1"
+shift
 
 declare -a local_libs
-declare -a defaults
-declare -a all_local_libs
-
-all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | sort -u))
+declare -a all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | grep -v -x travis | sort -u))
 
 if [ -n "$local_lib" ]; then
   local_libs=("$local_lib")
 else
+  found=''
   while read version ll; do
-    declare -a libs
-    if [ "$ll" == "*" ]; then
-      libs=("${all_local_libs[@]}")
-    elif [ "$ll" == '-' ]; then
-      libs=('')
-    else
-      libs=("$ll")
-    fi
+    if [ -n "$found" ] && [ "$found" != "$version" ]; then
+      true
+    elif [[ "$bare_version" = $version ]]; then
+      found="$version"
 
-    if [ "$version" == "*" ]; then
-      default_local_libs+=("${libs[@]}")
-    elif [ "$version" == "$bare_version" ]; then
-      local_libs+=("${libs[@]}")
+      if [ "$ll" == "*" ]; then
+        local_libs+=("${all_local_libs[@]}")
+      elif [ "$ll" == '-' ]; then
+        local_libs+=('')
+      else
+        local_libs+=("$ll")
+      fi
     fi
   done < local-libs.txt
 fi
 
-if [ "${#local_libs[@]}" == "0" ]; then
-  local_libs=("${default_local_libs[@]}")
-fi
-
 for ll in "${local_libs[@]}"; do
   [ -n "$ll" ] && ll="@$ll"
-  "$@" "$perl_version$ll"
+  "$cmd" "$perl_version$ll" "$@"
 done

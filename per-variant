@@ -5,30 +5,30 @@ bare_version="${perl_version/-*/}"
 local_lib="${1/*@/}"
 [ "$local_lib" == "$1" ] && unset local_lib
 shift
+cmd="$1"
+shift
 
 declare -a variants
 
 if [ "$bare_version" != "$perl_version" ]; then
   variants=("$perl_version")
 else
-  declare -a defaults
+  found=''
   while read version variant; do
-    full="$perl_version"
-    if [ "$variant" != "-" ]; then
-      full+="-$variant"
-    fi
-    if [ "$version" == "*" ]; then
-      defaults+=("$full")
-    elif [ "$version" == "$perl_version" ]; then
-      variants+=("$full")
+    if [ -n "$found" ] && [ "$found" != "$version" ]; then
+      true
+    elif [[ "$bare_version" = $version ]]; then
+      found="$version"
+
+      if [ "$variant" == "-" ]; then
+        variants+=("$perl_version")
+      else
+        variants+=("$perl_version-$variant")
+      fi
     fi
   done < variants.txt
-
-  if [ "${#variants[@]}" == "0" ]; then
-    variants=("${defaults[@]}")
-  fi
 fi
 
 for variant in "${variants[@]}"; do
-  "$@" "$variant"
+  "$cmd" "$variant" "$@"
 done
