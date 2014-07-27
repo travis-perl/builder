@@ -31,4 +31,8 @@ fi
 git config --replace-all url.git@github.com:.pushInsteadOf git://github.com/ '^git://github\.com/$'
 git config --replace-all url.git@github.com:.pushInsteadOf https://github.com/ '^https://github\.com/$'
 
+branches=($(
+  for branch in "${branches[@]}"; do echo $branch; done \
+    | sort -u
+))
 GIT_SSH=./ssh-wrapper git push origin "${branches[@]}"
