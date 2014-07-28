@@ -19,11 +19,6 @@ function commit_branch {
   local commitroot="$tempdir/commitroot"
   cp -R $cpopt "$src" "$commitroot"
   echo "$readme" > "$commitroot/README"
-  cat - > "$commitroot/.travis.yml" <<END_TRAVISYML
-branches:
-  only:
-    - "/ ^/" # never match
-END_TRAVISYML
   git add -f "$commitroot/"
   local tree="$(git write-tree --prefix="$commitroot/")"
   git reset -q -- "$tempdir"
