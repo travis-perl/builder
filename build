@@ -1,22 +1,15 @@
 #!/bin/bash
 set -e
-perl="$1"
+full_version="$1"
+local_lib="${full_version/*@/}"
+perl_version="${full_version/@*/}"
+[ "$local_lib" == "$full_version" ] && unset local_lib
 
 export REBUILD_PERL=1
-$HELPER_ROOT/build-perl "$perl"
+$HELPER_ROOT/bin/build-perl "$full_version"
 
-if perl -e'exit !(shift =~ /^5\.\d+($|-)/)' "$perl"; then
+if [[ "${perl_version/-*/}" =~ ^5.[0-9][0-9]?$ ]]; then
   source "$PERLBREW_ROOT/etc/bashrc"
-  perlbrew use "$perl"
-  $HELPER_ROOT/cpan-install \
-    Dist::Zilla \
-    Moose \
-    Test::Pod \
-    Test::Pod::Coverage \
-    Test::Exception \
-    Test::Kwalitee \
-    Dist::Zilla::Plugin::Bootstrap::lib \
-    LWP \
-    Module::Install \
-    Test::Most
+  perlbrew use "$perl_version"
+  $HELPER_ROOT/bin/cpan-install $($HELPER_ROOT/bin/modules-for-local-lib travis)
 fi

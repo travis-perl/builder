@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+perl_version="${1/@*/}"
+bare_version="${perl_version/-*/}"
+local_lib="${1/*@/}"
+[ "$local_lib" == "$1" ] && unset local_lib
+shift
+cmd="$1"
+shift
+
+declare -a local_libs
+declare -a all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | grep -v -x travis | sort -u))
+
+if [ -n "$local_lib" ]; then
+  local_libs=("$local_lib")
+else
+  found=''
+  while read version ll; do
+    if [ -n "$found" ] && [ "$found" != "$version" ]; then
+      true
+    elif [[ "$bare_version" = $version ]]; then
+      found="$version"
+
+      if [ "$ll" == "*" ]; then
+        local_libs+=("${all_local_libs[@]}")
+      elif [ "$ll" == '-' ]; then
+        local_libs+=('')
+      else
+        local_libs+=("$ll")
+      fi
+    fi
+  done < local-libs.txt
+fi
+
+for ll in "${local_libs[@]}"; do
+  [ -n "$ll" ] && ll="@$ll"
+  "$cmd" "$perl_version$ll" "$@"
+done

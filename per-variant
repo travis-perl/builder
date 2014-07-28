@@ -1,24 +1,34 @@
 #!/bin/bash
+set -e
+perl_version="${1/@*/}"
+bare_version="${perl_version/-*/}"
+local_lib="${1/*@/}"
+[ "$local_lib" == "$1" ] && unset local_lib
+shift
+cmd="$1"
+shift
 
 declare -a variants
-declare -a defaults
 
-while read version variant; do
-  full="$TRAVIS_PERL_VERSION"
-  if [ "$variant" != "-" ]; then
-    full+="-$variant"
-  fi
-  if [ "$version" == "*" ]; then
-    defaults+=("$full")
-  elif [ "$version" == "$TRAVIS_PERL_VERSION" ]; then
-    variants+=("$full")
-  fi
-done < variants.txt
+if [ "$bare_version" != "$perl_version" ]; then
+  variants=("$perl_version")
+else
+  found=''
+  while read version variant; do
+    if [ -n "$found" ] && [ "$found" != "$version" ]; then
+      true
+    elif [[ "$bare_version" = $version ]]; then
+      found="$version"
 
-if [ "${#variants[@]}" == "0" ]; then
-  variants=("${defaults[@]}")
+      if [ "$variant" == "-" ]; then
+        variants+=("$perl_version")
+      else
+        variants+=("$perl_version-$variant")
+      fi
+    fi
+  done < variants.txt
 fi
 
 for variant in "${variants[@]}"; do
-  "$@" "$variant"
+  "$cmd" "$variant" "$@"
 done

@@ -2,28 +2,49 @@ language: perl
 perl:
   - "5.6.2"
   - "5.8.1"
+  - "5.8.1-thr"
   - "5.8.5"
+  - "5.8.5-thr"
   - "5.8.7"
+  - "5.8.7-thr"
   - "5.8.8"
+  - "5.8.8-thr"
   - "5.8.9"
+  - "5.8.9-thr"
+  - "5.10.0"
+  - "5.10.0-thr"
+  - "5.10.1"
+  - "5.10.1-thr"
+  - "5.12.5"
+  - "5.12.5-thr"
+  - "5.14.4"
+  - "5.14.4-thr"
+  - "5.16.3"
+  - "5.16.3-thr"
   - "5.18.1"
+  - "5.18.1-thr"
   - "5.18.2"
-  - "5.20"
+  - "5.18.2-thr"
   - "5.20.0"
+  - "5.20.0-thr"
+  - "5.20"
 env:
   secure: "oRQHly05F2F1kaHz+d7D0Or85R6fshxCS3D9G8G0jqLOQcm8jUTwr6lEn7QHUU9e8A8MUk90LKeqNhIlX1CslniOuIbdg5V4eM70kHeZk6WRlsNn5J7QslgWnWZ//0+Kfeawe7d8XVam5FGFwNKrjYl75rl24l4bReV946IXvSY="
 before_install:
   - sudo apt-get update -qq
   - git clone git://github.com/haarg/perl-travis-helper ~/perl-travis-helper
   - source ~/perl-travis-helper/init
+  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"system\" ] && export NO_COMMIT_PERL=1 || true"
+  - "[ \"${TRAVIS_PERL_VERSION/@*/}\" == \"$PERLBREW_PERL\" ] && export NO_COMMIT_PERL=1 || true"
 install:
-  - ./per-variant ./build
+  - ./per-local-lib $TRAVIS_PERL_VERSION ./build
 script:
-  - ./per-variant ./commit
+  - ./per-local-lib $TRAVIS_PERL_VERSION ./commit
 after_success:
-  - ./push $(./per-variant echo)
+  - ./push $(./per-local-lib $TRAVIS_PERL_VERSION echo)
 branches:
-  only:
-    - master
+  exclude:
+    - /^perl\//
+    - /^libs\//
 notifications:
   email: false
