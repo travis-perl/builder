@@ -35,4 +35,4 @@ branches=($(
   for branch in "${branches[@]}"; do echo $branch; done \
     | sort -u
 ))
-GIT_SSH=./ssh-wrapper git push origin "${branches[@]}"
+GIT_SSH=./ssh-wrapper git push builds "${branches[@]}"

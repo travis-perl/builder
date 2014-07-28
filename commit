@@ -34,7 +34,7 @@ END_TRAVISYML
   export GIT_COMMITTER_EMAIL="travis-ci@$(hostname -f)"
   local parent="$(git rev-parse -q --verify "refs/heads/$branch" || true)"
   if [ -z "$parent" ]; then
-    if git fetch --depth=1 origin "$branch" 2>/dev/null; then
+    if git fetch --depth=1 builds "$branch" 2>/dev/null; then
       parent="$(git rev-parse FETCH_HEAD)"
     fi
   fi
