@@ -1,5 +1,5 @@
-Perl Builds for Travis-CI
--------------------------
-This repository contains builds of perl for Travis-CI, each in its own branch.
-It is meant for use with
-[perl-travis-helper](https://github.com/haarg/perl-travis-helper).
+Perl Builder for Travis-CI
+--------------------------
+This repository automatically builds copies of perl for use with Travis CI.
+
+See [perl-travis-helper](https://github.com/haarg/perl-travis-helper).
