@@ -9,7 +9,7 @@ cmd="$1"
 shift
 
 declare -a local_libs
-declare -a all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | grep -v -x travis | sort -u))
+declare -a all_local_libs=($(cat $HELPER_ROOT/share/local-libs.txt | awk '{ print $1 }' | grep -v '^[!#]' | sort -u))
 
 if [ -n "$local_lib" ]; then
   local_libs=("$local_lib")
