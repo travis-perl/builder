@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ssh -i id_rsa.dec -o 'StrictHostKeyChecking no' "$@"
+exec ssh -i id_rsa.dec -o 'StrictHostKeyChecking no' "$@"
