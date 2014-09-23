@@ -29,7 +29,7 @@ perl:
   - "5.20.0-thr"
   - "5.20"
 env:
-  secure: "u60c2PCxcyKzjRfvHXcdbRwbfX8oOLz7Pmntwv+aAlZjlPCMUdwcO+dEEvIjDjyPQgIcCWKNCMO4oBl59g7yiOJ70Q+IL/BNB1hjuRp170BoJld60A6C5aXunalsA7c0DVkxJch3o+z98lw6nAIkXEvQTzSqz2U8AHB1UGsLPAg="
+  secure: "Py9ploXbX87VbPuYS6oEK3TnepII7PkCe2b4oSZnkFZyMmQGU6M0sxQbLlNli6Drh25inHSgVod0Zx6ndX82CiM2yVsm1bQYTl1w6ZbMSdUsbajoiglUarHuhjQLKWSzcfraiTx7XdUAaU0NWIxKi8DupZW2CZalLSamuoj1njA="
 before_install:
   - sudo apt-get update -qq
   - git remote add builds git://github.com/travis-perl/builds
