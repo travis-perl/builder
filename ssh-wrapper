@@ -1,3 +1,7 @@
 #!/bin/bash
 
-exec ssh -i id_rsa.dec -o 'StrictHostKeyChecking no' "$@"
+if [ -z "$GIT_SSH_KEY" ]; then
+  GIT_SSH_KEY=id_rsa.dec
+fi
+
+exec ssh -i $GIT_SSH_KEY -o 'StrictHostKeyChecking no' "$@"
