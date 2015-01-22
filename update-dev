@@ -1,0 +1,47 @@
+#!/bin/sh
+
+cd "$( dirname "$0" )"
+
+# yep, i'm regexing html and there's nothing you can do about it
+latest="$(
+  curl -s http://www.cpan.org/src/README.html \
+  | perl -0777 -ne'
+    /<td>\s*Devel\s*<\/td>.*?(https?:\/\/[^"]+)/s
+      and $1 =~ /\/perl-(\d+\.\d+\.\d+)/
+      and print $1;
+  '
+)"
+
+if [ -z "$latest" ]; then
+  echo "Unable to find latest dev release!" 1>&2
+  exit 1
+fi
+
+dev="$(perl -ne'print $1 if /^# dev perl\b/../# end dev perl\b/ and  /^\s*-\s*"?([0-9.]+)"?$/' .travis.yml)"
+
+if [ "$dev" = "$latest" ]; then
+  exit 0
+fi
+
+perl -i -ne'
+  if (1../# dev perl\b/) {
+    print;
+    if (/# dev perl\b/) {
+      print qq{  - "'$latest'"\n};
+      print qq{  - "'$latest'-thr"\n};
+    }
+  }
+  elsif (/# end dev perl\b/..0) {
+    print;
+  }
+' .travis.yml
+
+export GIT_AUTHOR_NAME="Automatic Dev Perl Updates"
+export GIT_AUTHOR_EMAIL='autobuild@autobuild'
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+git pull 2>&1 >/dev/null
+git add .travis.yml > /dev/null
+git commit -m"update dev perl to $latest" > /dev/null
+git push origin master 2>&1 >/dev/null
