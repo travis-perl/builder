@@ -55,7 +55,7 @@ script:
 after_success:
   - ./push $(./per-local-lib $TRAVIS_PERL_VERSION echo)
 branches:
-  exclude:
+  except:
     - /^perl\//
     - /^libs\//
 notifications:
