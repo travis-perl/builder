@@ -4,11 +4,14 @@ cd "$( dirname "$0" )"
 
 # yep, i'm regexing html and there's nothing you can do about it
 latest="$(
-  curl -s http://www.cpan.org/src/README.html \
-  | perl -0777 -ne'
-    /<td>\s*Devel\s*<\/td>.*?(https?:\/\/[^"]+)/s
-      and $1 =~ /\/perl-(\d+\.\d+\.\d+)/
-      and print $1;
+  curl -s http://www.cpan.org/src/5.0/ \
+  | perl -nle'
+    push @f, [$1,$2]
+      if /href="perl-(5\.([1-9]?[13579]\.[1-9][0-9]*))\.tar\.gz"/;
+    END {
+      my $v = (sort { $b->[1] <=> $a->[1] } @f)[0][0];
+      print $v;
+    }
   '
 )"
 
