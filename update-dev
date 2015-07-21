@@ -1,6 +1,21 @@
-#!/bin/sh
+#!/bin/bash
+set -e
+
+function log_err {
+  local logfile="$(mktemp -t run-log-XXXXXX)"
+  if ! "$@" 2>&1 > "$logfile"; then
+    local status="$?"
+    cat "$logfile" 1>&2
+    rm "$logfile"
+    return "$status"
+  fi
+  return 0;
+}
 
 cd "$( dirname "$0" )"
+
+log_err git pull
+log_err git checkout .travis.yml
 
 # yep, i'm regexing html and there's nothing you can do about it
 latest="$(
@@ -23,6 +38,7 @@ fi
 dev="$(perl -ne'print $1 if /^# dev perl\b/../# end dev perl\b/ and  /^\s*-\s*"?([0-9.]+)"?$/' .travis.yml)"
 
 if [ "$dev" = "$latest" ]; then
+  log_err git push origin master
   exit 0
 fi
 
@@ -44,7 +60,6 @@ export GIT_AUTHOR_EMAIL='autobuild@autobuild'
 export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 
-git pull 2>&1 >/dev/null
-git add .travis.yml > /dev/null
-git commit -m"update dev perl to $latest" > /dev/null
-git push origin master 2>&1 >/dev/null
+log_err git add .travis.yml
+log_err git commit -m"update dev perl to $latest"
+log_err git push origin master
