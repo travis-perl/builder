@@ -3,9 +3,7 @@ set -e
 
 function log_err {
   local logfile="$(mktemp -t run-log-XXXXXX)"
-  if "$@" 2>&1 > "$logfile"; then
-    return 0;
-  fi
+  "$@" 2>&1 > "$logfile" && return 0
   local status="$?"
   cat "$logfile" 1>&2
   rm "$logfile"
