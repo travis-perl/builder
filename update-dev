@@ -3,13 +3,13 @@ set -e
 
 function log_err {
   local logfile="$(mktemp -t run-log-XXXXXX)"
-  if ! "$@" 2>&1 > "$logfile"; then
-    local status="$?"
-    cat "$logfile" 1>&2
-    rm "$logfile"
-    return "$status"
+  if "$@" 2>&1 > "$logfile"; then
+    return 0;
   fi
-  return 0;
+  local status="$?"
+  cat "$logfile" 1>&2
+  rm "$logfile"
+  return "$status"
 }
 
 cd "$( dirname "$0" )"
