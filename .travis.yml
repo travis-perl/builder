@@ -94,8 +94,8 @@ perl:
   - "5.32.0-thr"
   - "5.32"
 # dev perl
-  - "5.33.7"
-  - "5.33.7-thr"
+  - "5.33.8"
+  - "5.33.8-thr"
 # end dev perl
 env:
   secure: "Py9ploXbX87VbPuYS6oEK3TnepII7PkCe2b4oSZnkFZyMmQGU6M0sxQbLlNli6Drh25inHSgVod0Zx6ndX82CiM2yVsm1bQYTl1w6ZbMSdUsbajoiglUarHuhjQLKWSzcfraiTx7XdUAaU0NWIxKi8DupZW2CZalLSamuoj1njA="
